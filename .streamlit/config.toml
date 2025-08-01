@@ -1,2 +1,11 @@
+[general]
+email = "jayanthbala2006@email.com"
+
+[server]
+headless = true
+
+[theme]
+base = "light"
+
 [runtime]
 python_version = "3.10"
