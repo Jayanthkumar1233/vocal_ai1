@@ -1,5 +1,7 @@
-streamlit
-transformers
-torch
-sentencepiece
-TTS==0.17.9
+streamlit==1.47.1
+transformers==4.54.1
+torch==2.7.1
+sentencepiece==0.2.0
+gTTS==2.5.1
+pydub==0.25.1
+
