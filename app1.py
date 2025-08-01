@@ -3,7 +3,8 @@ import os
 import torch
 from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
 import tempfile
-from TTS.api import TTS
+from gtts import gTTS
+from pydub import AudioSegment
 
 # Load the LLM from Hugging Face
 @st.cache_resource
@@ -15,21 +16,23 @@ def load_model():
 
 generator = load_model()
 
-# Load the TTS model from Coqui TTS (pre-trained model)
-tts_model_name = TTS.list_models()[0]  # You can change this if needed
-tts = TTS(tts_model_name)
-
 # Function to rewrite text with tone
 def rewrite_with_tone(input_text, tone):
     prompt = f"Rewrite the following sentence in a {tone} tone: {input_text}"
     result = generator(prompt, max_length=100, do_sample=True, temperature=0.9)[0]['generated_text']
     return result.replace(prompt, '').strip()
 
-# Function to convert text to speech
+# Function to convert text to speech using gTTS
 def generate_audio(text, voice="female"):
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as f:
-        tts.tts_to_file(text=text, file_path=f.name)
-        return f.name
+    tts = gTTS(text=text, lang="en")
+    temp_mp3 = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+    tts.save(temp_mp3.name)
+
+    # Convert to WAV using pydub
+    audio = AudioSegment.from_mp3(temp_mp3.name)
+    temp_wav = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+    audio.export(temp_wav.name, format="wav")
+    return temp_wav.name
 
 # Streamlit UI
 st.set_page_config(page_title="EchoVerse – AI Audiobook Tool")
@@ -48,7 +51,7 @@ else:
 # Tone selection
 tone = st.selectbox("🎭 Choose Tone", ["Neutral", "Suspenseful", "Inspiring"])
 
-# Voice selection
+# Voice selection (gTTS only supports one voice per language, so this is just for UI)
 voice = st.selectbox("🔊 Choose Voice", ["female", "male"])
 
 # Action button
