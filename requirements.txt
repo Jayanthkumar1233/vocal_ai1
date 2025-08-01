@@ -1,7 +1,5 @@
 streamlit==1.47.1
 transformers==4.54.1
-torch==2.7.1
-sentencepiece==0.2.0
+torch==2.7.1 --index-url https://download.pytorch.org/whl/cpu
 gTTS==2.5.1
 pydub==0.25.1
-
